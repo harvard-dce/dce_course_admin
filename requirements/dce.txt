@@ -1,0 +1,4 @@
+-r base.txt
+
+django-toolbelt==0.0.1
+django-postgrespool==0.3.0
