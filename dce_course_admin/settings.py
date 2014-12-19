@@ -18,6 +18,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'dce_course_admin/templates'),)
 
 ALLOWED_HOSTS = ['*']
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -74,6 +75,9 @@ SECRET_KEY = env('DJANGO_SECRET_KEY', required=True)
 
 ADMINS = ((env('DJANGO_ADMIN_NAME'), env('DJANGO_ADMIN_EMAIL')))
 
+# depends on DATABASE_URL being set in your env. See https://github.com/kennethreitz/dj-database-url
+# you can also set DJANGO_DATABASE_DEFAULT_ENGINE if you want to override the
+# default engine, e.g., using https://github.com/kennethreitz/django-postgrespool/
 DATABASES = {
     'default': dj_database_url.config(engine=env('DJANGO_DATABASE_DEFAULT_ENGINE', None))
 }
