@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block extra_css %}
+<!-- DataTables CSS -->
+<link rel="stylesheet" type="text/css" href="{% static 'datatables/css/jquery.dataTables.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'datatables/css/dataTables.bootstrap.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'datatables/css/bootstrap-switch.css' %}">
+{% endblock %}
+
+{% block content %}
+<table id="course_list" class="display">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Course</th>
+            <th>Term</th>
+            <th>Public Syllabus</th>
+            <th>Status</th>
+            <th>Published</th>
+            <th>Public</th>
+        </tr>
+    </thead>
+</table>
+{% endblock %}
+
+{% block extra_js %}
+<!-- DataTables -->
+<script type="text/javascript" charset="utf8" src="{% static 'datatables/js/jquery.dataTables.js' %}"></script>
+<script type="text/javascript" charset="utf8" src="{% static 'datatables/js/dataTables.bootstrap.js' %}"></script>
+<script type="text/javascript" charset="utf8" src="{% static 'datatables/js/bootstrap-switch.js' %}"></script>
+
+<script type="text/javascript" charset="utf8">
+    $(document).ready( function () {
+        $('#course_list').DataTable({
+//            serverSide: true,
+            ajax: {
+                url: "{{ course_data_url }}"
+            },
+            dom: "iprtlf",
+            pageLength: 5,
+            order: [ 1, 'asc' ],
+            columns: [
+                {
+                    orderable: false,
+                    data: function(row, type, set, meta) {
+                        return '<button type="submit" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-home"></span></button>' +
+                                '<button type="submit" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-calendar"></span></button>';
+                    }
+                },
+                {
+                    data: 'name'
+                },
+                {
+                    data: 'term',
+                    render: function(data, type, full, meta) {
+                        return data.name;
+                    }
+                },
+                {
+                    data: 'public_syllabus',
+                    render: function (data, type, full, meta) {
+                        return data ? "Y" : "N";
+                    }
+                },
+                {
+                    data: 'workflow_state'
+                },
+                {
+                    data: 'workflow_state',
+                    render: function (data, type, full, meta) {
+                        if (data == "available" || data == "unpublished") {
+                            var checked = (data == "available") ? "checked" : "";
+                            return '<input data-size="mini" data-on-text="Y" data-off-text="N" type="checkbox" class="publish-toggle" ' + checked + '>';
+                        }
+                        return "";
+                    }
+                },
+                {
+                    data: 'is_public',
+                    render: function (data, type, full, meta) {
+                        var checked = data ? "checked" : "";
+                        return '<input data-size="mini" data-on-text="Y" data-off-text="N" type="checkbox" class="public-toggle" ' + checked + '>';
+                    }
+                }
+            ],
+            drawCallback: function(settings, json) {
+                $(".publish-toggle").bootstrapSwitch();
+                $(".public-toggle").bootstrapSwitch();
+            }
+        });
+    });
+</script>
+
+{% endblock %}

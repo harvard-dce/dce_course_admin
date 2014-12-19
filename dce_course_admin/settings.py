@@ -13,9 +13,7 @@ import os
 import dj_database_url
 from getenv import env
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-
-TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'dce_course_admin/templates'),)
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 ALLOWED_HOSTS = ['*']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -57,8 +55,14 @@ USE_L10N = True
 
 USE_TZ = True
 
-STATIC_ROOT = 'staticfiles'
+STATIC_ROOT = 'static_root'
 STATIC_URL = '/static/'
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'course_admin/static'), )
+
+TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR, 'templates'),
+    os.path.join(BASE_DIR, 'course_admin/templates'),
+)
 
 LTI_APPS = {
     'course_admin': {
@@ -73,7 +77,7 @@ LTI_APPS = {
 
 SECRET_KEY = env('DJANGO_SECRET_KEY', required=True)
 
-ADMINS = ((env('DJANGO_ADMIN_NAME'), env('DJANGO_ADMIN_EMAIL')))
+ADMINS = ((env('DJANGO_ADMIN_NAME'), env('DJANGO_ADMIN_EMAIL')),)
 
 # depends on DATABASE_URL being set in your env. See https://github.com/kennethreitz/dj-database-url
 # you can also set DJANGO_DATABASE_DEFAULT_ENGINE if you want to override the
