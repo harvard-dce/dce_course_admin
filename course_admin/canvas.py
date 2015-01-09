@@ -1,8 +1,12 @@
 
 import drest
+from drest.exc import dRestRequestError
 from canvas_api_token.utils import canvas_uri
 
 API_PATH = '/api/v1/'
+
+class CourseUpdateError(dRestRequestError):
+    pass
 
 class CanvasApi(drest.API):
 
@@ -19,13 +23,26 @@ class CanvasApi(drest.API):
     def __init__(self, canvas_base_url, access_token, account_id):
         self.account_id = account_id
         self.canvas_base_url = canvas_base_url
-        access_params = {'access_token': access_token}
-        super(CanvasApi, self).__init__(canvas_base_url + API_PATH, extra_url_params=access_params)
+        access_header = {'Authorization': "Bearer %s" % access_token}
+        super(CanvasApi, self).__init__(canvas_base_url + API_PATH,
+                                        extra_headers=access_header,
+                                        serialize=True,
+                                        trailing_slash=False)
         self._init_resources()
 
     def _init_resources(self):
+        self.add_resource('courses', path='/courses')
         self.add_resource('account_courses',
                           path='/accounts/%d/courses' % self.account_id)
         self.add_resource('account_terms',
                           path='/accounts/%d/terms' % self.account_id)
 
+    def set_course_is_public(self, course_id, state):
+        state = state and 'true' or 'false'
+        params = { 'course': { 'is_public': state }}
+        return self.courses.put(course_id, params=params)
+
+    def set_course_is_published(self, course_id, state):
+        event_action = state and 'offer' or 'claim'
+        params = { 'course': { 'event': event_action }}
+        return self.courses.put(course_id, params=params)
