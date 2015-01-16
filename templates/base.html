@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+{% load static %}
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <!-- Bootstrap3 CSS -->
+    <link rel="stylesheet" href="{% static 'bootstrap3/css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap3/css/bootstrap-theme.css' %}">
+
+    {% block extra_css %}
+    {% endblock %}
+</head>
+<body>
+
+{% block content %}{% endblock content %}
+
+{% block javascript %}
+    <!-- jQuery -->
+    <script src="{% static 'js/jquery.js' %}"></script>
+    <script src="{% static 'js/lodash.js' %}"></script>
+
+    <!-- Bootsrap3 JS -->
+    <script src="{% static 'bootstrap3/js/bootstrap.js' %}"></script>
+
+    {% block extra_js %}
+    {% endblock %}
+{% endblock %}
+</body>
+</html>
