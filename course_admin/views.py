@@ -68,11 +68,13 @@ def course_data(request):
 
     canvas = CanvasApi.from_request(request)
     selected_term = request.GET.get('term', settings.CURRENT_TERM_ID)
-    params = {
-        'per_page': 1000,
-        'enrollment_term_id': 'sis_term_id:%s' % selected_term
-    }
-    course_data = canvas.account_courses.get(params=params).data
+    if selected_term == 'all':
+        selected_term = None
+
+    try:
+        course_data = canvas.get_account_courses(term_id=selected_term)
+    except:
+        raise
     for course in course_data:
         # is_public set to None when False; force boolean
         course['is_public'] = course.get('is_public') or False
