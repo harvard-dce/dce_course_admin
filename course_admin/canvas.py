@@ -69,31 +69,20 @@ class CanvasApi(drest.API):
         if term_id is not None:
             params['enrollment_term_id'] = 'sis_term_id:%s' % term_id
         if course_count > MAX_ITEMS_PER_REQUEST:
-            return self._get_account_courses_async(params, course_count)
+            return self._get_account_courses_multi_reqs(params, course_count)
         else:
             return self.account_courses.get(params=params).data
 
-    def _get_account_courses_async(self, params, course_count):
-        import grequests
-        urls = self._generate_async_urls(self.account_courses.path, params, course_count)
-        reqs = [grequests.request('GET', x, headers=self.access_header) for x in urls]
-        responses = grequests.map(reqs, size=MAX_CONCURRENT_REQUESTS)
+    def _get_account_courses_multi_reqs(self, params, course_count):
         course_data = []
-        for r in responses:
-            course_data.extend(r.json())
-        return course_data
-
-    def _generate_async_urls(self, path, params, item_count):
-        urls = []
         params['page'] = 1
         while True:
-            url = "%s/%s?%s" \
-                  % (self.baseurl, path, urlencode(params))
-            urls.append(url)
-            if (params['page'] * MAX_ITEMS_PER_REQUEST) >= item_count:
+            resp = self.account_courses.get(params=params)
+            course_data.extend(resp.data)
+            if (params['page'] * MAX_ITEMS_PER_REQUEST) >= course_count:
                 break
             params['page'] += 1
-        return urls
+        return course_data
 
     def set_course_is_public(self, course_id, state):
         state = state and 'true' or 'false'
