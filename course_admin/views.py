@@ -77,6 +77,7 @@ def course_data(request):
         raise
     for course in course_data:
         # is_public set to None when False; force boolean
+        course['DT_RowId'] = "course-%s" % course['id']
         course['is_public'] = course.get('is_public') or False
         course['homepage_url'] = "%s/courses/%s" \
             % (canvas.canvas_base_url, course['id'])
@@ -108,8 +109,9 @@ def update_course(request):
         elif setting_name == 'is_published':
             resp = canvas.set_course_is_published(course_id, setting_state)
         return JsonResponse({
-            'success': "Course %s updated: %s set to %s" \
-                       % (course_id, setting_name, str(setting_state))
+            'course_id': course_id,
+            'setting_name': setting_name,
+            'setting_state': setting_state
         })
     except CourseUpdateError, e:
         log.error("Course update failed: %s", e.msg)

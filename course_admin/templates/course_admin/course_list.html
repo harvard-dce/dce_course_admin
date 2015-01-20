@@ -148,7 +148,11 @@
                 },
                 {
                     name: 'status',
-                    data: 'workflow_state'
+                    data: 'workflow_state',
+                    createdCell: function(td, cellData, rowData, row, col) {
+                        // set this so that we can find/update the value later
+                        $(td).attr('id', 'data-course-' + rowData.id + '-status');
+                    }
                 },
                 {
                     name: 'is_published',
@@ -240,7 +244,13 @@
                         dataType: 'json'
                     });
                     update.done(function(data) {
-                        alert(data);
+                        if (data.setting_name == 'is_published') {
+                            var cell = api.cell('#data-course-' + data.course_id + '-status');
+                            var new_value = data.setting_state ? 'available' : 'unavailable';
+                            cell.data(new_value).draw();
+                        }
+                        alert('Success! ' + data.setting_name + ' for course '
+                            + data.course_id + ' set to ' + data.setting_state);
                     });
                 });
             }
