@@ -2,59 +2,53 @@
 {% load static %}
 {% block extra_css %}
 <!-- DataTables CSS -->
-<link rel="stylesheet" type="text/css" href="{% static 'datatables/css/jquery.dataTables.css' %}">
+<!-- link rel="stylesheet" type="text/css" href="{% static 'datatables/css/jquery.dataTables.css' %}" -->
 <link rel="stylesheet" type="text/css" href="{% static 'datatables/css/dataTables.bootstrap.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'datatables/css/bootstrap-switch.css' %}">
 {% endblock %}
 
 {% block content %}
-<table id="course_list" class="display">
-    <thead>
-    <tr>
-        <th>
-            <form method="GET" action="{% url 'course_admin' %}" class="inline-form">
+
+<div id="course_list_container" class="container-fluid">
+
+    <div class="col-md-8">
+        <h3>DCE Course Admin</h3>
+    </div>
+    <div id="course_list_terms" class="form-inline col-md-4 text-right text-nowrap">
+        <form method="GET" action="{% url 'course_admin' %}">
+            <label for="term">Term</label>
             <select name="term" class="form-control">
-                {% for term_id, term_name in terms.items %}
+                {% for term_id, term_name in terms %}
                 <option value="{{ term_id }}" {% if term_id == selected_term %}selected="selected"{% endif %}>{{ term_name }}</option>
                 {% endfor %}
             </select>
-            </form>
-        </th>
-        <th data-filter-by="search">Course</th>
-        <th data-filter-by="select">Syllabus</th>
-        <th data-filter-by="select">Default View</th>
-        <th data-filter-by="select">Status</th>
-        <th data-filter-by="select">Published</th>
-        <th data-filter-by="select">Public</th>
-    </tr>
-    </thead>
-    <tfoot>
+        </form>
+    </div>
+
+    <table id="course_list" class="table table-striped table-hover">
+        <thead class="headers">
         <tr>
-            <th>Filter:</th>
-            <th>Course</th>
-            <th>Syllabus</th>
-            <th>Default View</th>
-            <th>Status</th>
-            <th>Published</th>
-            <th>Public</th>
+            <th class="text-nowrap" data-filter-by="search">Course </th>
+            <th class="text-nowrap" data-filter-by="select">Public Syllabus </th>
+            <th class="text-nowrap" data-filter-by="select">Default View </th>
+            <th class="text-nowrap" data-filter-by="select">Published? </th>
+            <th class="text-nowrap" data-filter-by="select">Public? </th>
         </tr>
-    </tfoot>
-</table>
+        </thead>
+    </table>
+
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <!-- DataTables -->
 <script type="text/javascript" charset="utf8" src="{% static 'js/jquery.cookie.js' %}"></script>
+<script type="text/javascript" charset="utf8" src="{% static 'js/jquery.truncate.js' %}"></script>
 <script type="text/javascript" charset="utf8" src="{% static 'datatables/js/jquery.dataTables.js' %}"></script>
 <script type="text/javascript" charset="utf8" src="{% static 'datatables/js/dataTables.bootstrap.js' %}"></script>
 <script type="text/javascript" charset="utf8" src="{% static 'datatables/js/bootstrap-switch.js' %}"></script>
 
 <script type="text/javascript" charset="utf8">
-
-//    $.ajaxSetup({
-//        url: "{% url 'update_course' %}",
-//        dataType: 'json'
-//    });
 
     function iconLinkHtml(url, iconClass, css) {
         var a = $('<a target="_parent" class="btn btn-link btn-xs"><span class="glyphicon"></span></a>');
@@ -86,6 +80,7 @@
         }
 
         $.ajaxSetup({
+            // include csrftoken with POST|PUT update requests
             beforeSend: function(xhr, settings) {
                 if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
                     xhr.setRequestHeader("X-CSRFToken", csrftoken);
@@ -93,39 +88,33 @@
             }
         });
 
-        $('#course_list form select').on('change', function() {
-            $(this).closest('form').trigger('submit');
-        });
-
-        $('#course_list').DataTable({
+        var table = $('#course_list').DataTable({
             ajax: {
                 url: "{% url 'course_data' %}?term={{ selected_term }}"
             },
-            dom: "iprtl",
-//            pageLength: 5,
-            order: [ 1, 'asc' ],
+            // to make sense of this batshit, see: https://datatables.net/reference/option/dom
+            dom: 'irt<"paging row"lp>',
+            order: [ 0, 'asc' ],
             columns: [
-                {
-                    // icon links
-                    name: 'icon-links',
-                    orderable: false,
-                    data: function(row, type, val, meta) {
-                        var iconLinks = [];
-                        iconLinks.push([iconLinkHtml(row.homepage_url, 'glyphicon-home')]);
-                        if (_.has(row, 'calendar') && _.has(row.calendar, 'ics')) {
-                            iconLinks.push([iconLinkHtml(row.calendar.ics, 'glyphicon-calendar')]);
-                        }
-                        return '<div class="btn-group">' + iconLinks.join(' ') + '</div>';
-                    }
-                },
                 {
                     // course name & id
                     name: 'name',
                     data: function(row, type, val, meta) {
                         if (type == 'sort') {
                             return row.course_code;
+                        } else if (type == 'display') {
+                            var home_link = iconLinkHtml(
+                                row.homepage_url,
+                                'glyphicon-home',
+                                {'margin-right': '1em'}
+                            );
+                            var course_title = '[' + row.course_code + '] '
+                                + '<span class="course-name">'
+                                + row.name + '</span>';
+                            return home_link + course_title;
+                        } else {
+                            return row.name + ' ' + row.course_code;
                         }
-                        return row.course_code + ', ' + row.name
                     }
                 },
                 {
@@ -147,27 +136,16 @@
                     data: 'default_view'
                 },
                 {
-                    name: 'status',
-                    data: 'workflow_state',
-                    createdCell: function(td, cellData, rowData, row, col) {
-                        // set this so that we can find/update the value later
-                        $(td).attr('id', 'data-course-' + rowData.id + '-status');
-                    }
-                },
-                {
                     name: 'is_published',
-                    data: 'workflow_state',
-                    render: function (data, type, row, meta) {
-                        var isPublished = (data == 'available');
+                    data: function (row, type, set, meta) {
+                        var isPublished = (row.workflow_state == 'available');
                         if (type == 'display') {
                             // don't show toggle for 'deleted', 'completed', etc
-                            if (data == "available" || data == "unpublished") {
+                            if (row.workflow_state == "available" || row.workflow_state == "unpublished") {
                                 return toggleHtml('is_published', row.id, isPublished);
                             } else {
                                 return "";
                             }
-                        } else if (type == 'filter') {
-                            return data;
                         } else {
                             return isPublished ? 'Y' : 'N';
                         }
@@ -175,19 +153,23 @@
                 },
                 {
                     name: 'is_public',
-                    data: 'is_public',
-                    render: function (data, type, row, meta) {
+                    data: function (row, type, set, meta) {
                         if (type == 'display') {
-                            return toggleHtml('is_public', row.id, data);
-                        } else if (type == 'filter') {
-                            return data;
+                            return toggleHtml('is_public', row.id, row.is_public);
                         } else {
-                            return data ? "Y" : "N";
+                            return row.is_public ? "Y" : "N";
                         }
                     }
                 }
             ],
             drawCallback: function(settings, json) {
+                $(".course-name").truncate({
+                    width: 300,
+                    token: '&hellip;',
+                    side: 'right',
+                    multiline: false,
+                    addtitle: true
+                });
                 $(".course-toggle").bootstrapSwitch();
             },
             initComplete: function() {
@@ -198,22 +180,20 @@
                     return $(node).attr('data-filter-by') == 'select' ? true : false;
                 }).indexes().flatten().each( function( idx ) {
                     var column = api.column(idx);
+                    var select = $('<select class="column-filter form-control input-sm"><option value="">All</option></select>')
+                        .appendTo($(column.header()))
+                        .on('change', function () {
+                            var val = $.fn.dataTable.util.escapeRegex(
+                                    $(this).val()
+                            );
+                            column.search(val ? '^' + val + '$' : '', true, false)
+                                  .draw();
+                        });
                     if (column.data().unique().length > 1) { // don't show for columns with only 1 unique value
-                        var select = $('<select><option value=""></option></select>')
-                            .appendTo($(column.footer()).empty())
-                            .on('change', function () {
-                                var val = $.fn.dataTable.util.escapeRegex(
-                                        $(this).val()
-                                );
-                                column.search(val ? '^' + val + '$' : '', true, false)
-                                      .draw();
-                            });
                         column.data().unique().sort().each(function (d, j) {
                             select.append('<option value="' + d + '">' + d + '</option>');
                         });
-                    } else {
-                        $(column.footer()).empty();
-                    }
+                     }
                 });
 
                 // add search input filtering
@@ -221,14 +201,22 @@
                     return $(node).attr('data-filter-by') == 'search' ? true : false;
                 }).each( function(idx) {
                     var column = api.column(idx);
-                    var input = $('<input type="text" placeholder="search"/>')
-                            .appendTo($(column.footer()).empty())
+                    var input = $('<input class="column-filter form-control" type="text" placeholder="search"/>')
+                            .appendTo($(column.header()))
                             .on('keyup change', function() {
                                 column.search(this.value).draw();
                             });
                 });
 
-                // attach handlers to toggle switches
+                // prevent clicks on filtering controls from bubbling up to the
+                // column sorting event handler
+                $(".column-filter").on('click', function(e) {
+                    e.stopPropagation();
+                });
+
+                $(".column-filter").css({ display: 'block' });
+
+                // attach handler to toggle switches
                 $(".course-toggle").on('switchChange.bootstrapSwitch', function(event, state) {
                     var name = $(this).attr('name');
                     var course_id = $(this).attr('data-course-id');
@@ -244,17 +232,22 @@
                         dataType: 'json'
                     });
                     update.done(function(data) {
-                        if (data.setting_name == 'is_published') {
-                            var cell = api.cell('#data-course-' + data.course_id + '-status');
-                            var new_value = data.setting_state ? 'available' : 'unavailable';
-                            cell.data(new_value).draw();
-                        }
                         alert('Success! ' + data.setting_name + ' for course '
-                            + data.course_id + ' set to ' + data.setting_state);
+                        + data.course_id + ' set to ' + data.setting_state);
                     });
                 });
             }
         });
+
+        $("#course_list_info").addClass('col-md-12');
+        $("#course_list_length").addClass('col-md-4');
+        $("#course_list_paginate").addClass('col-md-8');
+
+        // refresh on term selection
+        $('#course_list_terms form select').on('change', function() {
+            $(this).closest('form').trigger('submit');
+        });
+
     });
 </script>
 

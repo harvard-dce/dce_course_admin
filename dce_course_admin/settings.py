@@ -100,13 +100,13 @@ LTI_APP_DEVELOPER_KEYS = {
 }
 
 CURRENT_TERM_ID = env('CURRENT_TERM_ID')
-ENROLLMENT_TERMS = {
-    '2014-1': 'Fall 2014-2015',
-    '2014-2': 'Spring 2014-2015',
-    '2014-5': 'Winter 2014-2015',
-    '2014-4': 'Full Year 2014-2015',
-    'all': 'All Courses'
-}
+ENROLLMENT_TERMS = [
+    ('2014-1', 'Fall 2014-2015'),
+    ('2014-2', 'Spring 2014-2015'),
+    ('2014-5', 'Winter 2014-2015'),
+    ('2014-4', 'Full Year 2014-2015'),
+    ('all', 'All Courses')
+]
 
 LOGGING = {
     'version': 1,

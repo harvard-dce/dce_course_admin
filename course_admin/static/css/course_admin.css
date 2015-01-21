@@ -1,0 +1,15 @@
+#course_list table {
+    width: 100%;
+    border-spacing: 0;
+    border-collapse: separate;
+}
+
+.paging {
+    padding-top: 0.5em;
+    margin-left: 0;
+    margin-right: 15px;
+}
+
+#course_list_wrapper .headers,.paging {
+    background-color: #F0F0F0;
+}
