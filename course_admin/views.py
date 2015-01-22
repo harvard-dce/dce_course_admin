@@ -8,6 +8,7 @@ from django.conf import settings
 from ims_lti_py.tool_config import ToolConfig
 from canvas_api_token.decorators import api_token_required
 from canvas import CanvasApi, CourseUpdateError
+from time import sleep
 
 import logging
 log = logging.getLogger(__name__)
@@ -96,25 +97,19 @@ def update_course(request):
         course_id = update['course_id']
     except KeyError, e:
         log.error("Invalid update params: %s", str(update))
-        return JsonResponse(
-            {'error': 'Invalid update params'},
+        return JsonResponse({'error': 'Invalid update params'},
             status=400,
             reason='Invalid update params'
         )
 
-    canvas = CanvasApi.from_request(request)
     try:
+        canvas = CanvasApi.from_request(request)
         if setting_name == 'is_public':
             resp = canvas.set_course_is_public(course_id, setting_state)
         elif setting_name == 'is_published':
             resp = canvas.set_course_is_published(course_id, setting_state)
-        return JsonResponse({
-            'course_id': course_id,
-            'setting_name': setting_name,
-            'setting_state': setting_state
-        })
-    except CourseUpdateError, e:
-        log.error("Course update failed: %s", e.msg)
-        return JsonResponse({'error': 'Course update failed'},
-                            status=500, reason='Invalid update params')
+        return JsonResponse(update)
+    except Exception, e:
+        log.error("Course update failed: %s", str(e))
+        return JsonResponse(update, status=500, reason=str(e))
 

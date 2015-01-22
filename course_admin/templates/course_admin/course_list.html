@@ -5,6 +5,7 @@
 <!-- link rel="stylesheet" type="text/css" href="{% static 'datatables/css/jquery.dataTables.css' %}" -->
 <link rel="stylesheet" type="text/css" href="{% static 'datatables/css/dataTables.bootstrap.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'datatables/css/bootstrap-switch.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'toastmessage/css/jquery.toastmessage.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -38,6 +39,17 @@
     </table>
 
 </div>
+
+<div style="display:none" id="spinner_src">
+<div class="spinner">
+  <div class="rect1"></div>
+  <div class="rect2"></div>
+  <div class="rect3"></div>
+  <div class="rect4"></div>
+  <div class="rect5"></div>
+</div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -47,6 +59,7 @@
 <script type="text/javascript" charset="utf8" src="{% static 'datatables/js/jquery.dataTables.js' %}"></script>
 <script type="text/javascript" charset="utf8" src="{% static 'datatables/js/dataTables.bootstrap.js' %}"></script>
 <script type="text/javascript" charset="utf8" src="{% static 'datatables/js/bootstrap-switch.js' %}"></script>
+<script type="text/javascript" charset="utf8" src="{% static 'toastmessage/js/jquery.toastmessage.js' %}"></script>
 
 <script type="text/javascript" charset="utf8">
 
@@ -68,6 +81,10 @@
         input.attr('name', name);
         input.attr('data-course-id', course_id);
         return input.clone().wrap('<div>').parent().html();
+    }
+
+    function spinnerHtml() {
+        return $(".spinner").clone().wrap('<div>').parent().html();
     }
 
     $(document).ready( function () {
@@ -95,6 +112,9 @@
             // to make sense of this batshit, see: https://datatables.net/reference/option/dom
             dom: 'irt<"paging row"lp>',
             order: [ 0, 'asc' ],
+            "language": {
+                "loadingRecords": spinnerHtml()
+            },
             columns: [
                 {
                     // course name & id
@@ -231,19 +251,40 @@
                         name: name,
                         state: state
                     };
-                    var update = $.ajax({
+                    $.ajax({
                         url: "{% url 'update_course' %}",
                         data: put_data,
                         type: 'PUT',
                         dataType: 'json'
-                    });
-                    update.done(function(data) {
+                    })
+                    .fail(function(jqXHR, status, error) {
+                        var data = jqXHR.responseJSON;
                         var row_selector = "#course-" + data.course_id;
-                        var col_selector = data.setting_name + ":name";
-                        var cell = table.cell(row_selector, col_selector);
-                        cell.data(data.setting_state).draw();
-                        alert('Success! ' + data.setting_name + ' for course '
-                        + data.course_id + ' set to ' + data.setting_state);
+                        var course_title = table.cell(row_selector, 'name:name').render('sort');
+                        var msg = 'Error!<br/>Failed to set ' + data.name + ' = '
+                                + data.state + ' for ' + course_title + '<br/>' + error;
+                        $().toastmessage('showToast', {
+                            type: 'error',
+                            text: msg,
+                            position: 'top-center',
+                            sticky: true
+                        });
+                    })
+                    .done(function(data, status, jqXHR) {
+                        // update the table data
+                        var row_selector = "#course-" + data.course_id;
+                        var col_selector = data.name + ":name";
+                        var cell = table.cell(row_selector, data.name + ":name");
+                        cell.data(data.state).draw();
+                        // notify success
+                        var course_title = table.cell(row_selector, 'name:name').render('sort');
+                        var msg = 'Success!<br/>Set ' + data.name + ' = '
+                                + data.state + ' for ' + course_title;
+                        $().toastmessage('showToast', {
+                            type: 'success',
+                            text: msg,
+                            position: 'top-center'
+                        });
                     });
                 });
             }

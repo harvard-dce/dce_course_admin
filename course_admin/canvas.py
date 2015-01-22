@@ -1,10 +1,13 @@
 from urllib import urlencode
 from urlparse import urlparse
 import drest
-from drest.exc import dRestRequestError
+from drest.exc import dRestRequestError, dRestError
 from requests.utils import parse_header_links
 from canvas_api_token.utils import canvas_uri
 from django.http import QueryDict
+
+import logging
+log = logging.getLogger(__name__)
 
 API_PATH = '/api/v1/'
 MAX_ITEMS_PER_REQUEST = 100
