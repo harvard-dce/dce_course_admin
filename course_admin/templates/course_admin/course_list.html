@@ -139,7 +139,10 @@
                     name: 'is_published',
                     data: function (row, type, set, meta) {
                         var isPublished = (row.workflow_state == 'available');
-                        if (type == 'display') {
+                        if (type == 'set') {
+                            row.workflow_state = set ? 'available': 'unpublished';
+                            return
+                        } else if (type == 'display') {
                             // don't show toggle for 'deleted', 'completed', etc
                             if (row.workflow_state == "available" || row.workflow_state == "unpublished") {
                                 return toggleHtml('is_published', row.id, isPublished);
@@ -154,7 +157,10 @@
                 {
                     name: 'is_public',
                     data: function (row, type, set, meta) {
-                        if (type == 'display') {
+                        if (type == 'set') {
+                            row.is_public = set;
+                            return
+                        } else if (type == 'display') {
                             return toggleHtml('is_public', row.id, row.is_public);
                         } else {
                             return row.is_public ? "Y" : "N";
@@ -232,6 +238,10 @@
                         dataType: 'json'
                     });
                     update.done(function(data) {
+                        var row_selector = "#course-" + data.course_id;
+                        var col_selector = data.setting_name + ":name";
+                        var cell = table.cell(row_selector, col_selector);
+                        cell.data(data.setting_state).draw();
                         alert('Success! ' + data.setting_name + ' for course '
                         + data.course_id + ' set to ' + data.setting_state);
                     });
