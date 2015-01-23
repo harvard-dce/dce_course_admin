@@ -14,10 +14,6 @@ import logging
 log = logging.getLogger(__name__)
 
 @require_GET
-def index(request):
-    pass
-
-@require_GET
 def tool_config(request):
 
     app_config = settings.LTI_APPS['course_admin']
@@ -54,7 +50,6 @@ def lti_launch(request):
 @api_token_required()
 @require_GET
 def course_admin(request):
-    canvas = CanvasApi.from_request(request)
     selected_term = request.GET.get('term', settings.CURRENT_TERM_ID)
     context = {
         'terms': settings.ENROLLMENT_TERMS,
@@ -105,9 +100,9 @@ def update_course(request):
     try:
         canvas = CanvasApi.from_request(request)
         if setting_name == 'is_public':
-            resp = canvas.set_course_is_public(course_id, setting_state)
+            canvas.set_course_is_public(course_id, setting_state)
         elif setting_name == 'is_published':
-            resp = canvas.set_course_is_published(course_id, setting_state)
+            canvas.set_course_is_published(course_id, setting_state)
         return JsonResponse(update)
     except Exception, e:
         log.error("Course update failed: %s", str(e))

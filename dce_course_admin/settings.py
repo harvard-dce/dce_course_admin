@@ -83,11 +83,13 @@ ADMINS = ((env('DJANGO_ADMIN_NAME'), env('DJANGO_ADMIN_EMAIL')),)
 # you can also set DJANGO_DATABASE_DEFAULT_ENGINE if you want to override the
 # default engine, e.g., using https://github.com/kennethreitz/django-postgrespool/
 DATABASES = {
-    'default': dj_database_url.config(engine=env('DJANGO_DATABASE_DEFAULT_ENGINE', None))
+    'default': dj_database_url.config(
+        engine=env('DJANGO_DATABASE_DEFAULT_ENGINE', None))
 }
 
 LTI_OAUTH_CREDENTIALS = {
-    env('LTI_OAUTH_COURSE_ADMIN_CONSUMER_KEY'): env('LTI_OAUTH_COURSE_ADMIN_CONSUMER_SECRET')
+    env('LTI_OAUTH_COURSE_ADMIN_CONSUMER_KEY'): env(
+        'LTI_OAUTH_COURSE_ADMIN_CONSUMER_SECRET')
 }
 
 LTI_APP_DEVELOPER_KEYS = {
@@ -122,7 +124,7 @@ LOGGING = {
     'formatters': {
         'main_formatter': {
             'format': '%(levelname)s:%(name)s: %(message)s '
-                     '(%(asctime)s; %(filename)s:%(lineno)d)',
+                      '(%(asctime)s; %(filename)s:%(lineno)d)',
             'datefmt': "%Y-%m-%d %H:%M:%S",
         },
     },
@@ -132,7 +134,7 @@ LOGGING = {
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
         },
-        'console':{
+        'console': {
             'level': 'DEBUG',
             'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
