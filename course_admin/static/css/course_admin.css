@@ -14,6 +14,10 @@
     background-color: #F0F0F0;
 }
 
+.spinner_src h3 {
+    text-align: center;
+}
+
 .spinner {
   margin: 100px auto;
   width: 100px;

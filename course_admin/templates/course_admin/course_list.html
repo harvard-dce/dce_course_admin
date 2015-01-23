@@ -40,14 +40,17 @@
 
 </div>
 
-<div style="display:none" id="spinner_src">
-<div class="spinner">
-  <div class="rect1"></div>
-  <div class="rect2"></div>
-  <div class="rect3"></div>
-  <div class="rect4"></div>
-  <div class="rect5"></div>
-</div>
+<div style="display:none">
+    <div class="spinner_src">
+        <h3>Loading. Please wait...</h3>
+        <div class="spinner">
+          <div class="rect1"></div>
+          <div class="rect2"></div>
+          <div class="rect3"></div>
+          <div class="rect4"></div>
+          <div class="rect5"></div>
+        </div>
+    </div>
 </div>
 
 {% endblock %}
@@ -84,7 +87,7 @@
     }
 
     function spinnerHtml() {
-        return $(".spinner").clone().wrap('<div>').parent().html();
+        return $(".spinner_src").clone().wrap('<div>').parent().html();
     }
 
     $(document).ready( function () {
@@ -107,7 +110,8 @@
 
         var table = $('#course_list').DataTable({
             ajax: {
-                url: "{% url 'course_data' %}?term={{ selected_term }}"
+                url: "{% url 'course_data' %}?term={{ selected_term }}",
+                timeout: 60000// can take a while due to Canvas API requiring multiple reqs to fetch all course data
             },
             // to make sense of this batshit, see: https://datatables.net/reference/option/dom
             dom: 'irt<"paging row"lp>',

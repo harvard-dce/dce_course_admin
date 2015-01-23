@@ -34,6 +34,7 @@ class CanvasApi(drest.API):
         self.access_header = {'Authorization': "Bearer %s" % access_token}
         super(CanvasApi, self).__init__(canvas_base_url + API_PATH,
                                         extra_headers=self.access_header,
+                                        timeout=60,
                                         serialize=True,
                                         trailing_slash=False)
         self._init_resources()
