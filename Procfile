@@ -1,1 +1,1 @@
-web: gunicorn dce_course_admin.wsgi --log-file -
+web: gunicorn -c gunicorn.py dce_course_admin.wsgi --log-file -
