@@ -5,6 +5,7 @@
 
 * Current enrollment term is "Spring 2014-2015"
 * Initial course data load can take quite a while and possibly even timeout, esp if selecting "All Courses" from the Term dropdown. 
+* When testing the actions that actually update the course published/public status you should confirm that the course was updated by viewing the course page (click the home icon and open in a new tab/window). The published status is visible on the course home page (upper right). To get the 'is_public' status you'll need to look at the course's Settings (link at bottom of left navbar). Scroll down until you get to 'Visibility' and see the 'Make this course publicly visible' option.
 
 ### User Story Checklist
 
