@@ -33,3 +33,4 @@ pip-log.txt
 tmp
 .env
 *.sqlite3
+static_root
