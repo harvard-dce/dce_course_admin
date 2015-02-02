@@ -30,5 +30,6 @@ As a user...
 * I should be able to update a course's "Is Public?" and "Is Published?" status by clicking the Y|N toggle switches in the respective columns.
 * When I update a course's status the value of the toggle switch should reflect the change.
 * When I update a course's status I should see a pop-up notification that the change was successful. The pop-up should disappear after 3 seconds or after I click the pop-up's close icon.
+* Following a course status update I should be able to undo the change by clicking the same toggle switch
 
 

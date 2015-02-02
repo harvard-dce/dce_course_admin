@@ -6,9 +6,19 @@
 2. Install the [heroku-toolbelt](https://toolbelt.heroku.com/).
 3. Clone the [dce_course_admin](https://github.com/harvard-dce/dce_course_admin repo).
 4. Run `heroku git:remote -a dce-course-admin`
-5. Add the required heroku add-ons: [Heroku Postgres](https://addons.heroku.com/heroku-postgresql) and [Mandrill](https://addons.heroku.com/mandrill)
+5. Add the required heroku add-ons: 
+    * [Heroku Postgres](https://addons.heroku.com/heroku-postgresql) 
+    * [Mandrill](https://addons.heroku.com/mandrill)
 6. Set up the remaining environment vars via `heroku config:set ...` (see below)
-7. Run `git push heroku master`
+7. Run `git push heroku master`. Heroku will detect and build the app.
+8. Run `heroku run python manage.py syncdb` to initialize the database. 
+    * Say, 'no', when prompted to create an admin user.
+9. Install the LTI app in the Canvas account settings UI. 
+    * Configuration Type: 'By URL'
+    * Name: 'DCE Course Admin'
+    * Consumer Key: value of the **LTI_OAUTH_COURSE_ADMIN_CONSUMER_KEY** env var
+    * Consumer Secret: value of the **LTI_OAUTH_COURSE_ADMIN_CONSUMER_SECRET** env var
+    * Config URL: https://dce-course-admin.herokuapp.com/course_admin/tool_config
 
 ### Required env vars
 
