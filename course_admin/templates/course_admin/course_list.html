@@ -247,53 +247,53 @@
 
                 $(".column-filter").css({ display: 'block' });
 
-                // attach handler to toggle switches
-                $(".course-toggle").on('switchChange.bootstrapSwitch', function(event, state) {
-                    var name = $(this).attr('name');
-                    var course_id = $(this).attr('data-course-id');
-                    var put_data = {
-                        course_id: course_id,
-                        name: name,
-                        state: state
-                    };
-                    $.ajax({
-                        url: "{% url 'update_course' %}",
-                        data: put_data,
-                        type: 'PUT',
-                        dataType: 'json'
-                    })
-                    .fail(function(jqXHR, status, error) {
-                        var data = jqXHR.responseJSON;
-                        var row_selector = "#course-" + data.course_id;
-                        var course_title = table.cell(row_selector, 'name:name').render('sort');
-                        var msg = 'Error!<br/>Failed to set ' + data.name + ' = '
-                                + data.state + ' for ' + course_title + '<br/>' + error;
-                        $().toastmessage('showToast', {
-                            type: 'error',
-                            text: msg,
-                            position: 'top-center',
-                            sticky: true
-                        });
-                    })
-                    .done(function(data, status, jqXHR) {
-                        // update the table data
-                        var row_selector = "#course-" + data.course_id;
-                        var col_selector = data.name + ":name";
-                        var cell = table.cell(row_selector, data.name + ":name");
-                        var state = data.state == 'true'
-                        cell.data(state).draw();
-                        // notify success
-                        var course_title = table.cell(row_selector, 'name:name').render('sort');
-                        var msg = 'Success!<br/>Set ' + data.name + ' = '
-                                + data.state + ' for ' + course_title;
-                        $().toastmessage('showToast', {
-                            type: 'success',
-                            text: msg,
-                            position: 'top-center'
-                        });
-                    });
-                });
             }
+        })
+        // attach handler to toggle switches
+        .on('switchChange.bootstrapSwitch', '.course-toggle', function(event, state) {
+            var name = $(this).attr('name');
+            var course_id = $(this).attr('data-course-id');
+            var put_data = {
+                course_id: course_id,
+                name: name,
+                state: state
+            };
+            $.ajax({
+                url: "{% url 'update_course' %}",
+                data: put_data,
+                type: 'PUT',
+                dataType: 'json'
+            })
+            .fail(function(jqXHR, status, error) {
+                var data = jqXHR.responseJSON;
+                var row_selector = "#course-" + data.course_id;
+                var course_title = table.cell(row_selector, 'name:name').render('sort');
+                var msg = 'Error!<br/>Failed to set ' + data.name + ' = '
+                        + data.state + ' for ' + course_title + '<br/>' + error;
+                $().toastmessage('showToast', {
+                    type: 'error',
+                    text: msg,
+                    position: 'top-center',
+                    sticky: true
+                });
+            })
+            .done(function(data, status, jqXHR) {
+                // update the table data
+                var row_selector = "#course-" + data.course_id;
+                var col_selector = data.name + ":name";
+                var cell = table.cell(row_selector, data.name + ":name");
+                var state = data.state == 'true'
+                cell.data(state).draw();
+                // notify success
+                var course_title = table.cell(row_selector, 'name:name').render('sort');
+                var msg = 'Success!<br/>Set ' + data.name + ' = '
+                        + data.state + ' for ' + course_title;
+                $().toastmessage('showToast', {
+                    type: 'success',
+                    text: msg,
+                    position: 'top-center'
+                });
+            });
         });
 
         $("#course_list_info").addClass('col-md-12');
