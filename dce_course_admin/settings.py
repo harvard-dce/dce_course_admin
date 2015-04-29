@@ -47,6 +47,7 @@ WSGI_APPLICATION = 'dce_course_admin.wsgi.application'
 
 AUTHENTICATION_BACKENDS = (
     'django_auth_lti.backends.LTIAuthBackend',
+    'django.contrib.auth.backends.ModelBackend'
 )
 
 TIME_ZONE = 'UTC'
@@ -97,18 +98,13 @@ DATABASES = {
         engine=env('DJANGO_DATABASE_DEFAULT_ENGINE', None))
 }
 
+REDIS_URL = env('REDIS_URL')
+
+LTI_REQUEST_VALIDATOR = 'course_admin.validator.LTIRequestValidator'
+
 LTI_OAUTH_CREDENTIALS = {
     env('LTI_OAUTH_COURSE_ADMIN_CONSUMER_KEY'): env(
         'LTI_OAUTH_COURSE_ADMIN_CONSUMER_SECRET')
-}
-
-LTI_APP_DEVELOPER_KEYS = {
-    # These values must be obtained by registering the LTI app with the canvas instance
-    # See: <instance_base_url>/developer_keys
-    env('LTI_OAUTH_COURSE_ADMIN_CONSUMER_KEY'): {
-        'client_id': env('CANVAS_DEVELOPER_KEY_CLIENT_ID'),
-        'client_secret': env('CANVAS_DEVELOPER_KEY_CLIENT_SECRET')
-    }
 }
 
 CURRENT_TERM_ID = env('CURRENT_TERM_ID')
@@ -144,7 +140,6 @@ LOGGING = {
         },
         'console': {
             'level': 'DEBUG',
-            'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
             'formatter': 'main_formatter',
         },

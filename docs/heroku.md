@@ -9,24 +9,25 @@
 5. Add the required heroku add-ons: 
     * [Heroku Postgres](https://addons.heroku.com/heroku-postgresql) 
     * [Mandrill](https://addons.heroku.com/mandrill)
+    * [RedisToGo](https://elements.heroku.com/addons/redistogo)
 6. Set up the remaining environment vars via `heroku config:set ...` (see below)
 7. Run `git push heroku master`. Heroku will detect and build the app.
-8. Run `heroku run python manage.py syncdb` to initialize the database. 
-    * Say, 'no', when prompted to create an admin user.
+8. Run `heroku run python manage.py migrate` to initialize the database. 
+    * Say, 'yes', when prompted to create an admin user. This is necessary for setting up the canvas developer key.
+9. Visit `https://<app_url>/admin`, login using the super user created in the previous step, and enter your Canvas developer key.
+    * Note: the redirect URI used to initially create the developer key via the Canvas admin must match `https://<app_url>`.
 9. Install the LTI app in the Canvas account settings UI. 
     * Configuration Type: 'By URL'
     * Name: 'DCE Course Admin'
     * Consumer Key: value of the **LTI_OAUTH_COURSE_ADMIN_CONSUMER_KEY** env var
     * Consumer Secret: value of the **LTI_OAUTH_COURSE_ADMIN_CONSUMER_SECRET** env var
-    * Config URL: https://dce-course-admin.herokuapp.com/course_admin/tool_config
+    * Config URL: `https://<app_url>/course_admin/tool_config`
 
 ### Required env vars
 
 ```
 LTI_OAUTH_COURSE_ADMIN_CONSUMER_KEY=...
 LTI_OAUTH_COURSE_ADMIN_CONSUMER_SECRET=...
-CANVAS_DEVELOPER_KEY_CLIENT_ID=...
-CANVAS_DEVELOPER_KEY_CLIENT_SECRET=...
 DJANGO_SECRET_KEY=...
 DJANGO_ADMIN_NAME=...
 DJANGO_ADMIN_EMAIL=...
@@ -34,15 +35,16 @@ DJANGO_SERVER_EMAIL
 PYTHONPATH=fakepath
 DJANGO_DATABASE_DEFAULT_ENGINE=django_postgrespool
 CURRENT_TERM_ID=2014-2
+REDIS_URL=...
 ```
 
 * **LTI_OAUTH_COURSE_ADMIN_CONSUMER_KEY** and **LTI_OAUTH_COURSE_ADMIN_CONSUMER_SECRET** are credentials needed during the Canvas LTI app installation. The key should be some simple, identifying string, like "dce-course-admin". For the secret you can probably just use a generated password or a [uuid4](http://en.wikipedia.org/wiki/Universally_unique_identifier#Version_4_.28random.29), but if you want to get fancy there's a [secret key generator](http://techblog.leosoto.com/django-secretkey-generation/) that I sometimes use.
-* **CANVAS_DEVELOPER_KEY_CLIENT_ID** and **CANVAS_DEVELOPER_KEY_CLIENT_SECRET** are necessary for the oauth workflow the app uses to generate user-specific canvas api keys. See: https://canvas.instructure.com/doc/api/file.oauth.html. Note that the domain of the app (eg, *https://dce-course-admin.herokuapp.com*) must match the value of the *REDIRECT_URI* used when generating this id/secret pair.
 * **DJANGO_SECRET_KEY**: see comments above about the *LTI_OAUTH_COURSE_ADMIN_CONSUMER_SECRET*.
 * **PYTHONPATH**: This is a common kludge to deal with [gunicorn weirdness on heroku](https://github.com/heroku/heroku-buildpack-python/wiki/Troubleshooting#no-module-named-appwsgiapp).
 * **DJANGO_ADMIN_NAME** and **DJANGO_ADMIN_EMAIL**: Set these to the name/email of the person or entity that will recieve app error notifications.
 * **DJANGO_SERVER_EMAIL**: app error notifications will use this as the "From:" address.
-* **CURRENT_TERM_ID**: this specifies which enrollment term should be the default view.
+* **CURRENT_TERM_ID**: this specifies which enrollment term should be the default view (currently listed in `settings.py`.
+* **REDIS_URL**: copy this from the **REDISTOGO_URL** that was inserted into your heroku config when the redis add-on was added.
 
 ### Additional env vars
 
