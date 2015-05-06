@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from django.core.urlresolvers import reverse
 from django.conf import settings
-from ims_lti_py.tool_config import ToolConfig
+from dce_lti_py.tool_config import ToolConfig
 from canvas_api_token.decorators import api_token_required
 from canvas import CanvasApi, CourseUpdateError
 from time import sleep
