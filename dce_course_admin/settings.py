@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 from getenv import env
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -111,13 +112,11 @@ LTI_APP_DEVELOPER_KEYS = {
 }
 
 CURRENT_TERM_ID = env('CURRENT_TERM_ID')
-ENROLLMENT_TERMS = [
-    ('2014-1', 'Fall 2014-2015'),
-    ('2014-2', 'Spring 2014-2015'),
-    ('2014-5', 'Winter 2014-2015'),
-    ('2014-4', 'Full Year 2014-2015'),
-    ('all', 'All Courses')
-]
+
+# env() will automatically eval the env string value into native python
+ENROLLMENT_TERMS = env('ENROLLMENT_TERMS', required=True)
+if not isinstance(ENROLLMENT_TERMS, list):
+    raise ImproperlyConfigured("eval of ENROLLMENT_TERMS failed; check syntax.")
 
 LOGGING = {
     'version': 1,
@@ -171,3 +170,4 @@ LOGGING = {
         },
     }
 }
+
