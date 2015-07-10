@@ -166,3 +166,4 @@ LOGGING = {
     }
 }
 
+TEST_DISCOVERY_ROOT = os.path.join(BASE_DIR, "tests")
