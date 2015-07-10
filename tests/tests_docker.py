@@ -2,8 +2,9 @@
 import unittest
 from selenium import webdriver
 from canvas_docker_test import CanvasDockerTestMixin
+from django.test import LiveServerTestCase
 
-class TestIntegration(CanvasDockerTestMixin, unittest.TestCase):
+class TestIntegration(CanvasDockerTestMixin, LiveServerTestCase):
 
     DOCKER_IMAGE = 'lbjay/canvas-docker'
     APP_SERVER_PORT = '8000'
@@ -36,9 +37,9 @@ class TestIntegration(CanvasDockerTestMixin, unittest.TestCase):
         self.assertTrue(len(tool_list) > 0)
         self.assertEqual(tool_list[0]['name'], 'Canvas-Docker LTI Test')
 
-    def test_tool_navigation(self):
-        self.assertTrue(True)
+    # def test_tool_navigation(self):
+    #     self.assertTrue(True)
 
 
 if __name__ == '__main__':
-    unittest.main(warnings='ignore')
+    unittest.main()
