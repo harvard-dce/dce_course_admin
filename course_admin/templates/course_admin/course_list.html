@@ -283,7 +283,7 @@
                 var col_selector = data.name + ":name";
                 var cell = table.cell(row_selector, data.name + ":name");
                 var state = data.state == 'true'
-                cell.data(state).draw();
+                cell.data(state).draw(false);
                 // notify success
                 var course_title = table.cell(row_selector, 'name:name').render('sort');
                 var msg = 'Success!<br/>Set ' + data.name + ' = '
