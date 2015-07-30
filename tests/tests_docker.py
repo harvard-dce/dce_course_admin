@@ -4,17 +4,14 @@ import unittest
 import requests
 from selenium import webdriver
 from python_docker_test import PythonDockerTestMixin, ContainerNotReady
-from django.test import LiveServerTestCase
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
 
 class TestIntegration(PythonDockerTestMixin, StaticLiveServerTestCase):
 
     CONTAINER_IMAGE = 'lbjay/canvas-docker'
-    CONTAINER_NAME = 'canvas-docker'
     CONTAINER_READY_TRIES = 10
     CONTAINER_READY_SLEEP = 20
-    APP_SERVER_PORT = 8000
 
     @classmethod
     def container_ready_callback(cls, container_data):
@@ -60,9 +57,8 @@ class TestIntegration(PythonDockerTestMixin, StaticLiveServerTestCase):
             'consumer_key': 'consumer_key',
             'shared_secret': 'secret_key',
             'config_type': 'by_url',
-            'config_url': 'http://{}:{}/course_admin/tool_config'.format(
-                self.docker_gateway_ip,
-                self.APP_SERVER_PORT)
+            'config_url': 'http://{}/course_admin/tool_config'.format(
+                os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'])
         }
 
         self.session.post(

@@ -2,3 +2,4 @@
 
 selenium
 selenium-requests
+python-docker-test
