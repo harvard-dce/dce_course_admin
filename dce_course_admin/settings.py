@@ -86,9 +86,13 @@ ADMINS = ((env('DJANGO_ADMIN_NAME'), env('DJANGO_ADMIN_EMAIL')),)
 # From: addr of the app error emails
 SERVER_EMAIL = env('DJANGO_SERVER_EMAIL', 'root@localhost')
 
-# use mandrill to send app error emails
-EMAIL_BACKEND = "djrill.mail.backends.djrill.DjrillBackend"
-MANDRILL_API_KEY = env('MANDRILL_APIKEY')
+# use sparkpost to send app error emails
+EMAIL_HOST = 'smtp.sparkpostmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'SMTP_Injection'
+EMAIL_HOST_PASSWORD = env('SPARKPOST_API_KEY')
+EMAIL_USE_TLS = True
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 # depends on DATABASE_URL being set in your env. See https://github.com/kennethreitz/dj-database-url
 # you can also set DJANGO_DATABASE_DEFAULT_ENGINE if you want to override the
