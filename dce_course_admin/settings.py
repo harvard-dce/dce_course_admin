@@ -84,7 +84,7 @@ SECRET_KEY = env('DJANGO_SECRET_KEY', required=True)
 ADMINS = ((env('DJANGO_ADMIN_NAME'), env('DJANGO_ADMIN_EMAIL')),)
 
 # From: addr of the app error emails
-SERVER_EMAIL = env('DJANGO_SERVER_EMAIL', 'root@localhost')
+SERVER_EMAIL = env('DJANGO_SERVER_EMAIL', env('DJANGO_SERVER_EMAIL'))
 
 # use sparkpost to send app error emails
 EMAIL_HOST = 'smtp.sparkpostmail.com'
@@ -169,4 +169,3 @@ LOGGING = {
         },
     }
 }
-
