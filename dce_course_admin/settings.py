@@ -26,7 +26,6 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'djrill',
     'canvas_api_token',
     'course_admin'
 )
@@ -80,20 +79,6 @@ LTI_APPS = {
 
 SECRET_KEY = env('DJANGO_SECRET_KEY', required=True)
 
-# this tells django who to send app error emails to
-ADMINS = ((env('DJANGO_ADMIN_NAME'), env('DJANGO_ADMIN_EMAIL')),)
-
-# From: addr of the app error emails
-SERVER_EMAIL = env('DJANGO_SERVER_EMAIL', env('DJANGO_SERVER_EMAIL'))
-
-# use sparkpost to send app error emails
-EMAIL_HOST = 'smtp.sparkpostmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'SMTP_Injection'
-EMAIL_HOST_PASSWORD = env('SPARKPOST_API_KEY')
-EMAIL_USE_TLS = True
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-
 # depends on DATABASE_URL being set in your env. See https://github.com/kennethreitz/dj-database-url
 # you can also set DJANGO_DATABASE_DEFAULT_ENGINE if you want to override the
 # default engine, e.g., using https://github.com/kennethreitz/django-postgrespool/
@@ -137,11 +122,6 @@ LOGGING = {
         },
     },
     'handlers': {
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
-        },
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
@@ -153,7 +133,7 @@ LOGGING = {
     },
     'loggers': {
         'django.request': {
-            'handlers': ['mail_admins', 'console'],
+            'handlers': ['console'],
             'level': 'ERROR',
             'propagate': True,
         },
