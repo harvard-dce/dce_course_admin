@@ -11,7 +11,8 @@ A Django LTI app for viewing and updating Canvas LMS courses.
 1. check that the `DATABASE_URL` value in your `.env` matches the user/db you created
 1. run `python manage.py migrate`
 1. run `python manage.py runserver [host:ip]`
-1. check that the app's tool config output is functional by visiting http://\[host:ip]/course_admin/tool_config
+1. Use the django `/admin` UI to create an entry in the `canvas_dev_key` table containing your canvas developer key values (see below)
+1. check that the app's tool config output is functional by visiting [http://host:ip/course_admin/tool_config]()
 1. register the app in your canvas instance 
     1. Go to the canvas Admin -> Settings -> Apps tab and click on `+ App` button
     1. Choose Configuration Type: URL
@@ -19,6 +20,21 @@ A Django LTI app for viewing and updating Canvas LMS courses.
     1. Consumer Key will be the `LTI_OAUTH_COURSE_ADMIN_CONSUMER_KEY` from your `.env`
     1. Shared Secret will be the `LTI_OAUTH_COURSE_ADMIN_CONSUMER_SECRET` from your `.env`
     1. Config URL will be `http(s)://[host:ip]/course_admin/tool_config`
+
+#### Canvas developer key
+
+This app makes use of the [harvard-dce/django-canvas-api-token](https://github.com/harvard-dce/django-canvas-api-token)
+extension to handle Canvas's oauth workflow for generating user access tokens. You'll need to get whoever admin's your
+institution's Canvas instance to generate this developer key for you. In a local dev/testing situation you can possibly make one yourself.
+
+If you happen to be using the [canvas-docker](https://hub.docker.com/r/lbjay/canvas-docker/) docker image there is a
+pre-generated developer key already included. Using the `/admin` UI create an entry in the `canvas_dev_key` table with 
+the following values:
+
+* consumer_key = "dce_course_admin" (if using the `example.env` values)
+* client_id = "1"
+* client_secret = "test_developer_key"
+
 
 ## Development setup
 
